@@ -1,6 +1,3 @@
-import SimpleLightbox from 'simplelightbox';
-import 'simplelightbox/dist/simple-lightbox.min.css';
-
 const images = [
   {
     preview:
@@ -67,35 +64,58 @@ const images = [
   },
 ];
 
-function createGalleryItemMarkUp(images) {
-  return images.map(({ preview, original, description }) => {
-    const item = document.createElement('li');
-    item.classList.add('gallery-item');
+const galleryImage = createGalleryMarkup(images);
+const gallery = document.querySelector('.gallery');
+gallery.innerHTML = galleryImage;
+gallery.addEventListener('click', selectorImage);
 
-    const link = document.createElement('a');
-    link.classList.add('gallery-link');
-    link.href = original;
+function selectorImage(event) {
+  event.preventDefault();
 
-    const image = document.createElement('img');
-    image.classList.add('gallery-image');
-    image.src = preview;
-    image.dataset.source = original;
-    image.alt = description;
+  if (!event.target.classList.contains('gallery-image')) {
+    return;
+  }
+  const original = event.target.dataset.source;
+  const description = event.target.alt;
+  const instance = basicLightbox.create(
+    `<div class = 'modal'>
+        <a class='modal-link' href= '${original}'>
+          <img class='modal-image' src= '${original}' alt= '${description}' />
+        </a>
+      </div>`,
+    {
+      onShow: () => {
+        document.addEventListener('keydown', onModalClose);
+      },
+      onClose: () => {
+        document.removeEventListener('keydown', onModalClose);
+      },
+    }
+  );
+  instance.show();
 
-    link.append(image);
-    item.append(link);
-
-    return item;
-  });
+  function onModalClose(event) {
+    if (event.code === 'Escape') {
+      document.removeEventListener('keydown', onModalClose);
+      instance.close();
+    }
+  }
 }
 
-
-const galleryItemsUl = document.querySelector('.gallery');
-const itemsMarkUp = createGalleryItemMarkUp(images);
-galleryItemsUl.append(...itemsMarkUp);
-
-let lightbox = new SimpleLightbox('.gallery a', {
-  showCounter: false,
-  captionsData: 'alt',
-  captionDelay: 250,
-});
+function createGalleryMarkup(images) {
+  return images
+    .map(
+      ({ preview, original, description }) =>
+        `<li class = 'gallery-item'>
+        <a class = 'gallery-link' href = '${original}'>
+          <img
+            class = 'gallery-image'
+            src = '${preview}'
+            data-source = '${original}'
+            alt = '${description}'
+          />
+        </a>
+      </li>`
+    )
+    .join('');
+}
