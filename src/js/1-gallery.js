@@ -1,3 +1,6 @@
+import SimpleLightbox from 'simplelightbox';
+
+import 'simplelightbox/dist/simple-lightbox.min.css';
 const images = [
   {
     preview:
@@ -64,58 +67,24 @@ const images = [
   },
 ];
 
-const galleryImage = createGalleryMarkup(images);
-const gallery = document.querySelector('.gallery');
-gallery.innerHTML = galleryImage;
-gallery.addEventListener('click', selectorImage);
+const list = document.querySelector('.gallery');
+const markup = images
+  .map(
+    images => `<li class="gallery-item">
+  <a class="gallery-link" href="${images.original}">
+    <img
+      class="gallery-image"
+      src="${images.preview}"
+      alt="${images.description}"
+    />
+  </a>
+</li>`
+  )
+  .join('');
 
-function selectorImage(event) {
-  event.preventDefault();
+list.innerHTML = markup;
 
-  if (!event.target.classList.contains('gallery-image')) {
-    return;
-  }
-  const original = event.target.dataset.source;
-  const description = event.target.alt;
-  const instance = basicLightbox.create(
-    `<div class = 'modal'>
-        <a class='modal-link' href= '${original}'>
-          <img class='modal-image' src= '${original}' alt= '${description}' />
-        </a>
-      </div>`,
-    {
-      onShow: () => {
-        document.addEventListener('keydown', onModalClose);
-      },
-      onClose: () => {
-        document.removeEventListener('keydown', onModalClose);
-      },
-    }
-  );
-  instance.show();
-
-  function onModalClose(event) {
-    if (event.code === 'Escape') {
-      document.removeEventListener('keydown', onModalClose);
-      instance.close();
-    }
-  }
-}
-
-function createGalleryMarkup(images) {
-  return images
-    .map(
-      ({ preview, original, description }) =>
-        `<li class = 'gallery-item'>
-        <a class = 'gallery-link' href = '${original}'>
-          <img
-            class = 'gallery-image'
-            src = '${preview}'
-            data-source = '${original}'
-            alt = '${description}'
-          />
-        </a>
-      </li>`
-    )
-    .join('');
-}
+new SimpleLightbox('.gallery a', {
+  captionsData: 'alt',
+  captionDelay: 250,
+});
