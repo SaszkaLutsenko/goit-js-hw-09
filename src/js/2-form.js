@@ -39,7 +39,8 @@ form.addEventListener("submit", (e) => {
         alert('All form fields must be filled in');
     } else {
         console.log(formObject);
-        form.reset()
+        form.reset();
+         localStorage.removeItem(localStorageKey)
        
     } 
 })
