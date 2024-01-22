@@ -46,6 +46,3 @@ form.addEventListener("submit", (e) => {
 })
 
 
-
-const aga = 'kochnie';
-console.log(aga);
